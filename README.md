@@ -1,3 +1,10 @@
 # RingCT
+Crypto library for Ring Confidential Transactions
+http://www.ledgerjournal.org/ojs/index.php/ledger/article/view/34
+Original Pre-prints https://github.com/ShenNoether/MiniNero 
 
-repo down until receive reasonable advice on publishing crypto software. 
+## Usage: 
+Edit the file "Test.cpp" and use runtest.sh or runtest.bat
+
+## Note: 
+Use at your own risk. 
