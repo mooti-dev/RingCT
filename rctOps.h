@@ -46,6 +46,8 @@
 #include "keccak.h"
 #include "crypto.h"
 
+#include "keccak2.h"
+
 #include "rctTypes.h"
 
 //Define this flag when debugging to get additional info on the console
@@ -156,6 +158,9 @@ key hash_to_scalar(key64 keys);
 key hashToPointSimple(const key &in);
 key hashToPoint(const key &in);
 void hashToPoint(key &out, const key &in);
+
+key sha3_cn(std::string);
+key string2Point(std::string);
 
 //sums a vector of curve points (for scalars use sc_add)
 void sumKeys(key & Csum, const key &Cis);

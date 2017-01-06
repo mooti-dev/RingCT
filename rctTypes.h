@@ -75,6 +75,8 @@ typedef struct key {
     }
     unsigned char bytes[32];
 };
+ostream& operator<<(ostream& os, key a);
+bool operator==(const key &lhs, const key &rhs);
 typedef vector<key> keyV; //vector of keys
 typedef vector<keyV> keyM; //matrix of keys (indexed by column first)
 
@@ -248,6 +250,7 @@ static const key64 H2 = {{0x8b, 0x65, 0x59, 0x70, 0x15, 0x37, 0x99, 0xaf, 0x2a, 
 
 //Debug printing for the above types
 //Actually use DP(value) and #define DBG
+key s2k(const char s[65]); 
 void dp(key a);
 void dp(bool a);
 void dp(char * a, int l);

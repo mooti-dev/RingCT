@@ -9,11 +9,18 @@
 #include "crypto-ops.h"
 #include "crypto.h"
 #include "keccak.h"
+#include "keccak2.h"
 
 #include "rctTypes.h"
 #include "rctOps.h"
 #include "rctSigs.h"
 
+#include <sstream>
+#include <string>
+#include <fstream>
+
+#define BOOST_TEST_MAIN
+#include <boost/test/unit_test.hpp>
 
 //Define this flag when debugging to get additional info on the console
 //works well on windows at least, not so much on osx..
@@ -24,22 +31,72 @@ using namespace crypto;
 using namespace std;
 using namespace rct;
 
+BOOST_AUTO_TEST_CASE(h2p)
+{
+    key G = scalarmultBase(d2h(1));
+    key H = hashToPointSimple(G);
+    cout << hashToPoint(H) << endl;
+    string chinese = "我是一个椅子";
+    string rook = "♜";
+    cout << string2Point(chinese) << endl;
+    cout << string2Point(rook) << endl;
+}
 
+BOOST_AUTO_TEST_CASE(chinese)
+{
+    char chash[65] = "eea84e9a5b1917be98646110898d96bfd945e81e8dc80c573ad95c4aee908365";
+    BOOST_REQUIRE_EQUAL(s2k(chash), string2Point("我是一个椅子"));
+}
+
+BOOST_AUTO_TEST_CASE(chess)
+{
+    string rook = "♜";
+    char rhash[65] = "74cba67cddac0bc8c1f9835bf8689a86f1b1dfaa8bb15873c4853f82e53a22b7";
+    BOOST_REQUIRE_EQUAL(string2Point(rook), s2k(rhash));
+}
+
+/*
 int main(int argc, char *argv[]) {
 
+    int SCRAP = -1000;
+    int UNICODE = -3;
     int HPow2 = -2;
     int Sanity = -1;
     int BORO = 0;
     int MG = 2;
     int RCT = 3;
-    int testnum = RCT;
+    int testnum = UNICODE;
 
     std::cout<<("Running tests ") << testnum <<endl;
     std::cout.setf(std::ios::boolalpha);
 
     int j = 0;
     int N = 0;
-    if (testnum == HPow2) {
+    if (testnum == -3) {
+        //setlocale(LC_ALL, "");
+        std::string s = "我是一个椅子";
+        unsigned char const *cc = s.c_str();
+        key okey;
+        std::ifstream infile("unicodeTestLines.txt");
+        std::ofstream ofile;
+        ofile.open("hashed.txt");
+        while (std::getline(infile, s))
+        {
+            //cc = s.c_str();
+            //FIPS202_SHA3_256_01(cc, (s.length()), okey.bytes); //correct. 0
+            ofile << sha3_cn(s)<< endl;
+        }
+        ofile.close();
+        
+        cout << "chinese unicode test" << endl;
+        
+        cout << string2Point("我是一个椅子") << endl; //agrees with js
+       
+        
+        cout << "random unicode test" << endl;
+        cout << string2Point( "♜") << endl; //agrees with js
+        
+    } if (testnum == HPow2) {
         std::cout << "testing hpow2" << endl;
         key G = scalarmultBase(d2h(1));
         key H = hashToPointSimple(G);
@@ -247,3 +304,5 @@ int main(int argc, char *argv[]) {
     } 
     return 0;
 }
+
+*/

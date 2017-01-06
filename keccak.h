@@ -4,6 +4,7 @@
 
 #ifndef keccak_H
 #define keccak_H
+
 #include <cstddef>
 #include <stdint.h>
 #include <string.h>

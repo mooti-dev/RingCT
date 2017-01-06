@@ -32,91 +32,161 @@
 using namespace crypto;
 using namespace std;
 
-namespace rct {
+namespace rct
+{
 
 //dp
 //Debug printing for the above types
 //Actually use DP(value) and #define DBG
 
-void dp(key a) {
+
+//Char to hex
+//only used internally by next function
+int c2h(char c) {
+    //0-9
+    if (48 <= c && c <= 57) {
+        return c - 48;
+    }
+    //caps A-F
+    if (65 <= c && c <= 70) { 
+        return 10 + c - 65;
+    }
+    if (97 <= c && c <= 102) {
+        return c - 97 + 10;
+    }
+}
+
+//string to key
+key s2k(const char s[65])
+{
+    key k;
+    for (int i = 0 ; i < 32 ; i++ ) {
+       k.bytes[i] = c2h(s[2*i + 1]) + 16 * c2h(s[2*i]);
+    }
+    return k;
+}
+
+void dp(key a)
+{
     int j = 0;
     printf("\"");
-    for (j = 0; j < 32; j++) {
+    for (j = 0; j < 32; j++)
+    {
         printf("%02x", (unsigned char)a.bytes[j]);
     }
     printf("\"");
     printf("\n");
 }
 
-void dp(bool a) {
+void dp(bool a)
+{
     printf(" ... %s ... ", a ? "true" : "false");
     printf("\n");
 }
 
-void dp(char * a, int l) {
+void dp(char *a, int l)
+{
     int j = 0;
     printf("\"");
-    for (j = 0; j < l; j++) {
+    for (j = 0; j < l; j++)
+    {
         printf("%02x", (unsigned char)a[j]);
     }
     printf("\"");
     printf("\n");
 }
-void dp(keyV a) {
+ostream &operator<<(ostream &os, key a)
+{
+    char buffer[64];
+    int j = 0;
+    for (j = 0; j < 32; j++)
+    {
+        sprintf(&buffer[j * 2], "%02x", (unsigned char)a[j]);
+    }
+    buffer[64] = '\0';
+    os << buffer;
+    return os;
+}
+bool operator==(const key &lhs, const key &rhs)
+{
+    bool rv = true;
+    int i = 0;
+    for (i = 0; i < 32; i++)
+    {
+        if (lhs[i] != rhs[i])
+        {
+            rv = false;
+        }
+    }
+    return rv;
+}
+void dp(keyV a)
+{
     int j = 0;
     printf("[");
-    for (j = 0; j < a.size(); j++) {
+    for (j = 0; j < a.size(); j++)
+    {
         dp(a[j]);
-        if (j < a.size() - 1) {
+        if (j < a.size() - 1)
+        {
             printf(",");
         }
     }
     printf("]");
     printf("\n");
 }
-void dp(keyM a) {
+void dp(keyM a)
+{
     int j = 0;
     printf("[");
-    for (j = 0; j < a.size(); j++) {
+    for (j = 0; j < a.size(); j++)
+    {
         dp(a[j]);
-        if (j < a.size() - 1) {
+        if (j < a.size() - 1)
+        {
             printf(",");
         }
     }
     printf("]");
     printf("\n");
 }
-void dp(xmr_amount vali) {
+void dp(xmr_amount vali)
+{
     printf("x: ");
     std::cout << vali;
     printf("\n\n");
 }
 
-void dp(int vali) {
+void dp(int vali)
+{
     printf("x: %d\n", vali);
     printf("\n");
 }
-void dp(bits amountb) {
+void dp(bits amountb)
+{
     int i = 0;
-    for (int i = 0; i < 64; i++) {
+    for (int i = 0; i < 64; i++)
+    {
         printf("%d", amountb[i]);
     }
     printf("\n");
-
 }
 
-void dp(char * st) {
+void dp(char *st)
+{
     printf("%s\n", st);
 }
 
 //Various Conversions
 
 //uint long long to 32 byte key
-void d2h(key & amounth, const xmr_amount in) {
+void d2h(key &amounth, const xmr_amount in)
+{
     sc_0(amounth.bytes);
     xmr_amount val = in;
     int i = 0, byte = 0;
-    while (val != 0) {
+    while (val != 0)
+    {
         amounth[i] = (unsigned char)(val & 0xFF);
         i++;
         val /= (xmr_amount)256;
@@ -124,12 +194,14 @@ void d2h(key & amounth, const xmr_amount in) {
 }
 
 //uint long long to 32 byte key
-key d2h(const xmr_amount in) {
+key d2h(const xmr_amount in)
+{
     key amounth;
     sc_0(amounth.bytes);
     xmr_amount val = in;
     int i = 0;
-    while (val != 0) {
+    while (val != 0)
+    {
         amounth[i] = (unsigned char)(val & 0xFF);
         i++;
         val /= (xmr_amount)256;
@@ -138,14 +210,17 @@ key d2h(const xmr_amount in) {
 }
 
 //uint long long to int[64]
-void d2b(bits  amountb, xmr_amount val) {
+void d2b(bits amountb, xmr_amount val)
+{
     int i = 0;
-    while (val != 0) {
+    while (val != 0)
+    {
         amountb[i] = val & 1;
         i++;
         val >>= 1;
     }
-    while (i < 64) {
+    while (i < 64)
+    {
         amountb[i] = 0;
         i++;
     }
@@ -154,53 +229,65 @@ void d2b(bits  amountb, xmr_amount val) {
 //32 byte key to uint long long
 // if the key holds a value > 2^64
 // then the value in the first 8 bytes is returned
-xmr_amount h2d(const key & test) {
+xmr_amount h2d(const key &test)
+{
     xmr_amount vali = 0;
     int j = 0;
-    for (j = 7; j >= 0; j--) {
+    for (j = 7; j >= 0; j--)
+    {
         vali = (xmr_amount)(vali * 256 + (unsigned char)test.bytes[j]);
     }
     return vali;
 }
 
 //32 byte key to int[64]
-void h2b(bits amountb2, const key & test) {
+void h2b(bits amountb2, const key &test)
+{
     int val = 0, i = 0, j = 0;
-    for (j = 0; j < 8; j++) {
+    for (j = 0; j < 8; j++)
+    {
         val = (unsigned char)test.bytes[j];
         i = 8 * j;
-        while (val != 0) {
+        while (val != 0)
+        {
             amountb2[i] = val & 1;
             i++;
             val >>= 1;
         }
-        while (i < 8 * (j + 1)) {
+        while (i < 8 * (j + 1))
+        {
             amountb2[i] = 0;
         }
     }
 }
 
 //int[64] to 32 byte key
-void b2h(key & amountdh, const bits amountb2) {
+void b2h(key &amountdh, const bits amountb2)
+{
     int byte, i, j;
-    for (j = 0; j < 8; j++) {
+    for (j = 0; j < 8; j++)
+    {
         byte = 0;
         i = 8 * j;
-        for (i = 7; i > -1; i--) {
+        for (i = 7; i > -1; i--)
+        {
             byte = byte * 2 + amountb2[8 * j + i];
         }
         amountdh[j] = (unsigned char)byte;
     }
-    for (j = 8; j < 32; j++) {
+    for (j = 8; j < 32; j++)
+    {
         amountdh[j] = (unsigned char)(0x00);
     }
 }
 
 //int[64] to uint long long
-xmr_amount b2d(bits amountb) {
+xmr_amount b2d(bits amountb)
+{
     xmr_amount vali = 0;
     int j = 0;
-    for (j = 63; j >= 0; j--) {
+    for (j = 63; j >= 0; j--)
+    {
         vali = (xmr_amount)(vali * 2 + amountb[j]);
     }
     return vali;

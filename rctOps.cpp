@@ -46,7 +46,7 @@ void zero(key &zero) {
 
 //Creates a zero scalar
 key zero() {
-    return{ {0x00, 0x00, 0x00,0x00 , 0x00, 0x00, 0x00,0x00 , 0x00, 0x00, 0x00,0x00 , 0x00, 0x00, 0x00,0x00 , 0x00, 0x00, 0x00,0x00 , 0x00, 0x00, 0x00,0x00 , 0x00, 0x00, 0x00,0x00 , 0x00, 0x00, 0x00,0x00  } };
+    return{ {0x00, 0x00, 0x00,0x00 , 0x00, 0x00, 0x00,0x00 , 0x00, 0x00, 0x00,0x00 , 0x00, 0x00, 0x00,0x00 , 0x00, 0x00, 0x00,0x00 , 0x00, 0x00, 0x00,0x00 , 0x00, 0x00, 0x00,0x00 , 0x00, 0x00, 0x00,0x00 } };
 }
 
 //Creates a zero elliptic curve point
@@ -403,8 +403,6 @@ key cn_fast_hash(ctkeyV PC) {
     return rv;
 }
 
-
-
 key hash_to_scalar(ctkeyV PC) {
     key rv = cn_fast_hash(PC);
     sc_reduce32(rv.bytes);
@@ -485,6 +483,27 @@ key hashToPoint(const key & hh) {
     ge_p1p1_to_p3(&res, &point2);
     ge_p3_tobytes(pointk.bytes, &res);
     return pointk;
+}
+
+key sha3_cn(std::string someString) {
+    key rv;
+    unsigned char *asBytes = someString.c_str();
+    FIPS202_SHA3_256_01(asBytes, someString.length(), rv.bytes); //correct. 0
+    return rv;
+}
+
+//works under ubuntu 16, 
+//not tested elsewhere
+key string2Point(std::string someString) {
+    key rv = sha3_cn(someString);
+    ge_p2 point;
+    ge_p1p1 point2;
+    ge_p3 res;
+    ge_fromfe_frombytes_vartime(&point, rv.bytes);
+    ge_mul8(&point2, &point);
+    ge_p1p1_to_p3(&res, &point2);
+    ge_p3_tobytes(rv.bytes, &res);
+    return rv;
 }
 
 void fe_mul(fe h,const fe f,const fe g)
