@@ -1,0 +1,2 @@
+running Test.cpp
+shared secret from sender: "6fdc3ae8eb5aec65c720ed47e8fda636395d8ee8e01a88130706048c5dff0106"shared secret calculated by receiver: "6fdc3ae8eb5aec65c720ed47e8fda636395d8ee8e01a88130706048c5dff0106"

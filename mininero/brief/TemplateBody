@@ -1,0 +1,20 @@
+/*
+ * File:   Asdf.cpp
+ * Author: Shen Noether <shen.noether@gmx.com>
+ *
+ */
+
+#include "Asdf.h"
+
+namespace crypto {
+
+asdf::asdf() {
+}
+
+asdf::asdf(const asdf& orig) {
+}
+
+asdf::~asdf() {
+}
+}
+
